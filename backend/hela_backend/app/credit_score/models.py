@@ -27,7 +27,7 @@ def _uuid() -> uuid.UUID:
 
 class ScoreSnapshot(Base):
     """
-    A point-in-time capture of a user's Hela Score.
+    A point-in-time capture of a user's Mula Score.
 
     One snapshot is created each time the scoring engine runs.
     The latest snapshot is the user's current score.

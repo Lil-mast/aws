@@ -1,12 +1,12 @@
-# Hela: Intelligent Financial Clarity for All
+# Mula: Intelligent Financial Clarity for All
 
-**Hela** is an AI-powered personal and business finance platform built for individuals, families, professionals, and enterprises, starting in Kenya and scaling globally. Hela provides actionable insights, intelligent budgeting, smart reminders, automated goal tracking, and now a **Hela Score** that shows how your everyday money decisions shape your financial standing.
+**Mula** is an AI-powered personal and business finance platform built for individuals, families, professionals, and enterprises, starting in Kenya and scaling globally. Mula provides actionable insights, intelligent budgeting, smart reminders, automated goal tracking, and a **Mula Score** that shows how everyday money decisions shape financial health.
 
 ---
 
 ## Run the App
 
-https://hela-mvp.hela-africa.workers.dev/
+The application is under active development; run the backend locally using the steps below.
 
 ---
 
@@ -14,7 +14,7 @@ https://hela-mvp.hela-africa.workers.dev/
 
 - [Quick Start](#quick-start)
 - [Core Features](#core-features)
-- [Hela Score](#hela-score)
+- [Mula Score](#mula-score)
 - [Smart Budget Agent](#smart-budget-agent)
 - [AI Assistant Architecture](#ai-assistant-architecture)
 - [Integrations](#integrations-in-progress)
@@ -28,7 +28,7 @@ https://hela-mvp.hela-africa.workers.dev/
 - [License](#license)
 - [Support](#support)
 
-The full technology breakdown lives in [TECH_STACK.md](./TECH_STACK.md).
+The full technology breakdown lives in [tech.md](./tech.md).
 
 ---
 
@@ -45,7 +45,7 @@ The full technology breakdown lives in [TECH_STACK.md](./TECH_STACK.md).
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd hela
+   cd mula
    ```
 
 2. **Frontend Setup**
@@ -58,39 +58,34 @@ The full technology breakdown lives in [TECH_STACK.md](./TECH_STACK.md).
 
 3. **Backend Setup**
    ```bash
-   cd backend/hela_backend
+   cd backend
    python -m venv venv
    source venv/bin/activate  # Windows: venv\Scripts\activate
-   pip install -r requirements.txt
+   pip install -r hela_backend/requirements.txt
    cp .env.example .env
-   # Configure .env with database credentials and API keys
-   python manage.py migrate
-   python manage.py runserver
+   # Edit backend/.env with local credentials as needed
+   uvicorn main:app --app-dir hela_backend --reload
    ```
-   Backend API runs on: http://localhost:8000
-
-4. **Start Background Services** (optional, for Celery/Redis features)
-   ```bash
-   redis-server
-   celery -A hela_backend worker -l info
-   ```
+   Backend API runs on: http://localhost:8000 (docs at `/docs`; health at `/health`)
 
 ### Environment Variables
-Create `.env` in `backend/hela_backend/`:
+Create `backend/.env` from `backend/.env.example`:
 ```bash
-# Django
-SECRET_KEY=your_django_secret_key
+# Mula API
+APP_ENV=development
+SECRET_KEY=replace-with-a-random-secret
 DEBUG=True
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
 
-# Database (omit for SQLite default, or configure PostgreSQL via DATABASE_URL)
-DATABASE_URL=postgresql://user:password@host:5432/dbname?sslmode=require
+# Database (blank uses local SQLite; configure PostgreSQL for production)
+DATABASE_URL=
 
 # Google OAuth
 GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 
 # AWS Bedrock (for AI features)
-AI_PROVIDER=bedrock
+AI_PROVIDER=local
 BEDROCK_REGION=us-east-1
 BEDROCK_NOVA_LITE_MODEL_ID=arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0
 BEDROCK_NOVA_MICRO_MODEL_ID=arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0
@@ -103,29 +98,28 @@ REDIS_URL=redis://localhost:6379/1
 # Paystack
 PAYSTACK_SECRET_KEY=your-paystack-secret-key
 
-# Hela Score
+# Mula Score
 SCORE_ENGINE_VERSION=1
-SCORE_RECALC_SCHEDULE=daily
 ```
 
 ---
 
 ## Core Features
 
-### Hela for Personal Use
+### Mula for Personal Use
 - **Dashboard**: Overview of finances, goals, savings, score, and tips
 - **Transactions**: Sync with M-Pesa to view and label expenses
 - **Budget**: Smart budget builder with the 50/30/20 rule, income and expense tracking
-- **AI Coach**: Interactive chat with Hela's Smart Budget Agent for personalized financial guidance
+- **AI Coach**: Interactive chat with Mula's Smart Budget Agent for personalized financial guidance
 - **Goals**: Track financial goals like an emergency fund, school fees, and more
-- **Hela Score**: A living financial health score with a clear explanation of every change
+- **Mula Score**: A living financial health score with a clear explanation of every change
 - **Chat History**: Persistent conversation history, browse, load, and delete past chats
 - **Reminders**: Get alerts for bills, savings, and tasks
 - **Savings**: Link M-Shwari, KCB M-Pesa, and Ziidi for live savings updates
 - **Learn Page**: Financial literacy with an interactive AI tutor
 - **Settings**: Profile, preferences, plan, and subscription management
 
-### Hela for Business (Coming Soon)
+### Mula for Business (Coming Soon)
 - Cash flow dashboards
 - Expense categorization and insights
 - AI-powered financial forecasting
@@ -135,17 +129,17 @@ SCORE_RECALC_SCHEDULE=daily
 
 ---
 
-## Hela Score
+## Mula Score
 
-Most people only learn about their credit standing when a loan is declined. Hela flips that. The **Hela Score** is a behavior-based financial health score that updates as you make decisions, so you can see the effect of a good choice the moment you make it.
+Most people only learn about their credit standing when a loan is declined. Mula flips that. The **Mula Score** is a behavior-based financial health score that updates as you make decisions, so you can see the effect of a good choice the moment you make it.
 
-> **Important:** The Hela Score is an educational, behavior-based score. It is **not** a credit bureau score (such as TransUnion, Metropol, or Creditinfo in Kenya) and does not replace one. Future phases may add bureau data and lender-facing reports with explicit user consent.
+> **Important:** The Mula Score is an educational, behavior-based score. It is **not** a credit bureau score (such as TransUnion, Metropol, or Creditinfo in Kenya) and does not replace one. Future phases may add bureau data and lender-facing reports with explicit user consent.
 
 ### The Idea
 
 1. You make a money decision (pay a bill early, hit a savings target, stay within budget).
-2. Hela detects it from your transactions, budget, and goals.
-3. Your score moves, and Hela shows exactly why: *"+6 points: You paid your KPLC bill 3 days before the due date."*
+2. Mula detects it from your transactions, budget, and goals.
+3. Your score moves, and Mula shows exactly why: *"+6 points: You paid your KPLC bill 3 days before the due date."*
 4. The AI Coach explains what to do next to keep improving.
 
 ### Score Range and Tiers
@@ -160,11 +154,11 @@ The score runs from **300 to 850**, split into tiers:
 | Strong | 670 – 739 | Reliable repayment and healthy savings. |
 | Excellent | 740 – 850 | Highly disciplined, lender-ready behavior. |
 
-New users start with a baseline score once they have at least **30 days** of synced data. Until then, Hela shows a "Score warming up" progress state instead of a number.
+New users start with a baseline score once they have at least **30 days** of synced data. Until then, Mula shows a "Score warming up" progress state instead of a number.
 
 ### Score Factors
 
-| Factor | Weight | What Hela Looks At |
+| Factor | Weight | What Mula Looks At |
 |--------|--------|--------------------|
 | **Payment Consistency** | 30% | On-time bills, loan repayments, and subscription payments |
 | **Savings Behavior** | 25% | Regular contributions, emergency fund progress, goal completion |
@@ -196,7 +190,7 @@ Before acting, users can ask: *"What happens to my score if I clear my Fuliza ba
 
 ### AI Coach Integration
 
-The score engine is **deterministic**: all calculations happen in the Django backend using transparent rules. The AI (Nova Lite) only **narrates and coaches** around the numbers. It never invents or changes a score.
+The score engine is **deterministic**: calculations happen in the backend using transparent rules. The AI (Nova Lite) only **narrates and coaches** around the numbers. It never invents or changes a score.
 
 Example coaching:
 - *"Your score rose 18 points this month, mostly from consistent savings. Your biggest opportunity now is reducing Fuliza use."*
@@ -223,7 +217,7 @@ Example coaching:
 
 ## Smart Budget Agent
 
-Hela includes an intelligent **Smart Budget Agent** that builds a complete personal budget plan interactively.
+Mula includes an intelligent **Smart Budget Agent** that builds a complete personal budget plan interactively.
 
 ### How It Works
 
@@ -244,7 +238,7 @@ The agent follows a structured 5-step process, showing calculations after every 
 - Recommends emergency fund building
 - Handles overspending by suggesting cuts to wants, not needs
 - Asks one question at a time for a natural conversation flow
-- Shows how budget decisions affect your Hela Score
+- Shows how budget decisions affect your Mula Score
 
 ### Visual Progress Tracker
 When chatting with the agent, a 5-stage progress bar shows your current position:
@@ -258,7 +252,7 @@ Completed stages light up green as you progress.
 ## AI Assistant Architecture
 
 ### Provider System
-Hela supports pluggable AI providers. The provider is selected via the `AI_PROVIDER` env var:
+Mula supports pluggable AI providers. The provider is selected via the `AI_PROVIDER` env var:
 
 | Provider | `AI_PROVIDER` value | Description |
 |----------|-------------------|-------------|
@@ -298,7 +292,7 @@ The assistant recognizes the following task types:
 - **Paystack**: Payment processing
 - **Google OAuth**: Social login
 - **Ziidi / KCB M-Pesa / M-Shwari**: Savings and investments
-- **Credit Reference Bureaus** (planned): Optional, consent-based data enrichment for the Hela Score
+- **Credit Reference Bureaus** (planned): Optional, consent-based data enrichment for the Mula Score
 
 ---
 
@@ -308,8 +302,8 @@ The assistant recognizes the following task types:
 2. **Profile setup** to customize the experience
 3. **Data sync**: Transactions pulled, labeled, categorized
 4. **User selects or builds a budget plan** using the Smart Budget Agent
-5. **Hela AI assistant** gives tips, reminders, and updates via conversation
-6. **Hela Score** is calculated from behavior and updates after meaningful decisions
+5. **Mula AI assistant** gives tips, reminders, and updates via conversation
+6. **Mula Score** is calculated from behavior and updates after meaningful decisions
 7. **User tracks savings goals**, receives reports and feedback
 8. **Chat history** is saved so any past conversation can be revisited
 
@@ -327,7 +321,7 @@ The assistant recognizes the following task types:
 │   ├── pages/              # Page components
 │   │   ├── BudgetPage.tsx  # Budget tab + AI Coach with Smart Budget Agent
 │   │   ├── ChatPage.tsx    # Full AI Coach with conversation history sidebar
-│   │   ├── ScorePage.tsx   # Hela Score: gauge, history, factors, simulator
+│   │   ├── ScorePage.tsx   # Mula Score: gauge, history, factors, simulator
 │   │   └── ...
 │   ├── lib/
 │   │   └── api.ts          # API client with auth headers
@@ -352,7 +346,7 @@ The assistant recognizes the following task types:
 │       │   └── services/
 │       │       ├── bedrock_client.py        # Bedrock Nova integration + rate limiting
 │       │       └── conversation_manager.py  # Conversation orchestration + fallback
-│       ├── credit_score/         # Hela Score app
+│       ├── credit_score/         # Mula Score app
 │       │   ├── models.py         # ScoreSnapshot, ScoreEvent, ScoreFactor
 │       │   ├── views.py          # Score, history, factors, events, simulate endpoints
 │       │   ├── tasks.py          # Celery: scheduled and event-triggered recalculation
@@ -367,7 +361,7 @@ The assistant recognizes the following task types:
 │
 ├── .env.example             # Frontend env template
 ├── .gitignore
-├── TECH_STACK.md
+├── tech.md
 └── README.md
 ```
 
@@ -376,26 +370,20 @@ The assistant recognizes the following task types:
 ## API Documentation
 
 ### Authentication Endpoints
-- `POST /api/v1/auth/register/`: User registration
-- `POST /api/v1/auth/login/`: User login (returns JWT tokens)
-- `POST /api/v1/auth/google/`: Google OAuth sign-in
-- `POST /api/v1/auth/logout/`: Invalidate refresh token
-- `POST /api/v1/auth/token/refresh/`: Refresh JWT access token
-- `GET /api/v1/auth/profile/`: Get user profile
-- `PUT /api/v1/auth/profile/update/`: Update profile
+- `POST /api/v1/auth/register`: User registration
+- `POST /api/v1/auth/login`: User login (returns JWT tokens)
+- `POST /api/v1/auth/google`: Google OAuth sign-in
+- `POST /api/v1/auth/logout`: Invalidate refresh token
+- `POST /api/v1/auth/token/refresh`: Refresh JWT access token
+- `GET /api/v1/auth/profile`: Get user profile
+- `PUT /api/v1/auth/profile/update`: Update profile
 
 ### AI Assistant Endpoints
-- `POST /api/v1/ai/chat/`: Chat with Hela AI (supports `budget_planning`, `financial_advice`, `score_coaching`, `chat`, and more tasks)
-- `POST /api/v1/ai/analyze/`: Analyze recent transactions with AI
-- `GET /api/v1/ai/conversations/`: List user's conversation history
-- `GET /api/v1/ai/conversations/<id>/`: Get conversation with all messages
-- `DELETE /api/v1/ai/conversations/<id>/delete/`: Delete a conversation
-- `GET /api/v1/ai/insights/`: Get AI-generated insights
-- `GET /api/v1/ai/goals/`: List financial goals
-- `POST /api/v1/ai/goals/create/`: Create financial goal
-- `GET /api/v1/ai/stats/`: AI provider usage statistics (Bedrock only)
+- `POST /api/v1/assistant/chat`: Chat with Mula AI (supports `budget_planning`, `financial_advice`, `score_coaching`, and `chat`)
+- The chat endpoint accepts `{ "message": "...", "conversation_id": null, "task_type": "chat" }` and requires a bearer access token.
+- Other assistant endpoints are planned.
 
-### Hela Score Endpoints (Planned)
+### Mula Score Endpoints (Planned)
 - `GET /api/v1/score/`: Current score, tier, and change since last period
 - `GET /api/v1/score/history/`: Score snapshots over time for charting
 - `GET /api/v1/score/factors/`: Breakdown by factor with per-factor status
@@ -405,9 +393,11 @@ The assistant recognizes the following task types:
 - `DELETE /api/v1/score/data/`: Delete score history (user data control)
 
 ### Budget & Financial Planning Endpoints
-- `GET /api/v1/financial/budgets/`: List budgets
-- `POST /api/v1/financial/budgets/create/`: Create a budget
-- `GET /api/v1/financial/budgets/<id>/`: Budget details with categories
+- `GET /api/v1/financial/budgets`: List budgets
+- `POST /api/v1/financial/budgets/create`: Create a budget
+- `GET /api/v1/financial/budgets/{id}`: Budget details with categories
+
+The interactive API reference is available at `/docs`; the liveness endpoint is `GET /health`.
 - `GET /api/v1/financial/savings/`: List savings plans
 - `POST /api/v1/financial/savings/create/`: Create savings plan
 - `GET /api/v1/financial/expenses/`: List expenses
@@ -428,10 +418,10 @@ The assistant recognizes the following task types:
 - [x] Persistent AI chat history
 - [x] Bedrock Nova routing with rate limiting
 - [ ] M-Pesa live transaction sync
-- [ ] **Hela Score Phase 1**: rule-based score, history, decision feed
-- [ ] **Hela Score Phase 2**: what-if simulator and score-linked challenges
-- [ ] Hela for Business
-- [ ] **Hela Score Phase 3**: opt-in verified reports and lender pilots
+- [ ] **Mula Score Phase 1**: rule-based score, history, decision feed
+- [ ] **Mula Score Phase 2**: what-if simulator and score-linked challenges
+- [ ] Mula for Business
+- [ ] **Mula Score Phase 3**: opt-in verified reports and lender pilots
 - [ ] Regional expansion beyond Kenya
 
 ---
@@ -440,16 +430,9 @@ The assistant recognizes the following task types:
 
 ### Running Tests
 ```bash
-# Frontend tests
-pnpm test
-
-# Backend tests
+# Backend tests (from backend/hela_backend)
 cd backend
-python manage.py test
-
-# With coverage
-coverage run --source='.' manage.py test
-coverage report
+pytest
 ```
 
 ### Code Quality
@@ -465,19 +448,7 @@ flake8
 ```
 
 ### Database Management
-```bash
-# Create migrations
-python manage.py makemigrations
-
-# Apply migrations
-python manage.py migrate
-
-# Create superuser
-python manage.py createsuperuser
-
-# Access admin panel
-http://localhost:8000/admin/
-```
+Production Alembic migration setup is pending. Development automatically creates tables in SQLite.
 
 ---
 
@@ -499,20 +470,17 @@ docker-compose down
 
 2. **Static Files**
    ```bash
-   python manage.py collectstatic --noinput
+   # Serve FastAPI with an ASGI server such as Uvicorn.
    ```
 
 3. **Database**
    ```bash
-   python manage.py migrate
-   python manage.py createsuperuser
+   # Production database migration setup is pending.
    ```
 
 4. **Start Services**
    ```bash
-   gunicorn --workers 4 --bind 0.0.0.0:8000 hela_backend.wsgi:application
-   celery -A hela_backend worker -l info
-   celery -A hela_backend beat -l info
+   uvicorn main:app --app-dir backend/hela_backend --host 0.0.0.0 --port 8000
    ```
 
 ---
@@ -534,9 +502,7 @@ This project is licensed under the MIT License. See the LICENSE file for details
 ## Support
 
 For support and questions:
-- 📧 Email: support@hela.co.ke
-- 💬 Discord: [Join our community](https://discord.gg/hela)
-- 📱 WhatsApp: +254 712 345 678
+Contact details will be published when Mula launches.
 
 ---
 

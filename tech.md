@@ -1,6 +1,6 @@
-# Hela Tech Stack
+# Mula Tech Stack
 
-A breakdown of the technologies behind Hela, why each was chosen, and how the new **Hela Score** fits into the architecture.
+A breakdown of the technologies behind Mula, why each was chosen, and how the new **Mula Score** fits into the architecture.
 
 ---
 
@@ -9,9 +9,9 @@ A breakdown of the technologies behind Hela, why each was chosen, and how the ne
 | Layer | Tools / Frameworks |
 |-------|-------------------|
 | Frontend | React, TypeScript, Vite, TailwindCSS, Framer Motion |
-| Backend | Django, Django REST Framework |
+| Backend | FastAPI, SQLAlchemy 2 async |
 | AI Layer | AWS Bedrock (Nova Lite + Nova Micro) with local fallback |
-| Scoring Engine | Deterministic Python service inside Django (versioned rules) |
+| Scoring Engine | Deterministic Python service inside FastAPI (versioned rules) |
 | Database | PostgreSQL (Neon) in production, SQLite in development |
 | Cache | Redis |
 | Task Queue | Celery + Celery Beat |
@@ -46,13 +46,13 @@ A breakdown of the technologies behind Hela, why each was chosen, and how the ne
 
 | Tool | Purpose |
 |------|---------|
-| **Django** | Core framework, ORM, admin, auth |
-| **Django REST Framework** | REST API, serializers, permissions |
-| **JWT (SimpleJWT)** | Stateless authentication with refresh tokens |
-| **Gunicorn** | Production WSGI server |
+| **FastAPI** | Async API framework, validation, OpenAPI docs |
+| **SQLAlchemy** | Async ORM for SQLite development and PostgreSQL production |
+| **JWT** | Stateless authentication with refresh tokens |
+| **Uvicorn** | ASGI server for local development and production |
 | **Nginx** | Reverse proxy and static file serving |
 
-**Django apps**
+**Backend modules**
 
 | App | Responsibility |
 |-----|---------------|
@@ -60,8 +60,7 @@ A breakdown of the technologies behind Hela, why each was chosen, and how the ne
 | `ai_assistant` | Conversations, messages, insights, goals, Bedrock integration |
 | `transactions` | Transaction storage, sync, and categorization |
 | `financial_planning` | Budgets, income, expenses, savings plans |
-| `payments` | Paystack integration |
-| `credit_score` | Hela Score: snapshots, events, factors, simulator |
+| `credit_score` | Mula Score: snapshots, events, and factors (API planned) |
 
 ---
 
@@ -80,7 +79,7 @@ A breakdown of the technologies behind Hela, why each was chosen, and how the ne
 
 ---
 
-## Hela Score Engine
+## Mula Score Engine
 
 ### Architecture
 
@@ -203,7 +202,7 @@ Reminders & Bills ─────┘         ▼                   ▼
 
 ## Suggested Next Technical Steps for the Score
 
-1. Create the `credit_score` Django app with `ScoreSnapshot`, `ScoreFactor`, and `ScoreEvent` models.
+1. Add `ScoreSnapshot`, `ScoreFactor`, and `ScoreEvent` API endpoints to the existing `credit_score` module.
 2. Build the event detector against existing transaction categories and budget data.
 3. Implement the scoring engine with unit tests for every rule (golden-file tests per `engine_version`).
 4. Add the `/api/v1/score/` endpoints and the `ScorePage` UI.

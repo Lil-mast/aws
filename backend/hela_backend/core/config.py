@@ -6,15 +6,17 @@ All other modules import from here — never read os.environ directly.
 """
 
 from functools import lru_cache
+from pathlib import Path
 from typing import List
 
-from pydantic import field_validator
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        # Keep credentials in backend/.env, independent of the process cwd.
+        env_file=Path(__file__).resolve().parents[2] / ".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -37,9 +39,15 @@ class Settings(BaseSettings):
     @property
     def effective_database_url(self) -> str:
         """Return the resolved database URL (SQLite fallback for dev)."""
-        if self.database_url:
-            return self.database_url
-        return "sqlite+aiosqlite:///./hela_dev.db"
+        url = self.database_url or "sqlite+aiosqlite:///./mula_dev.db"
+        # SQLAlchemy's async engine requires an async PostgreSQL driver.
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        if url.startswith("postgresql+asyncpg://") and "sslmode=" in url:
+            url = url.replace("sslmode=", "ssl=", 1)
+        return url
 
     # ── CORS ─────────────────────────────────────────────────────────────────
     allowed_origins: str = "http://localhost:5173,http://localhost:3000"
@@ -65,9 +73,18 @@ class Settings(BaseSettings):
     aws_access_key_id: str = ""
     aws_secret_access_key: str = ""
 
-    # ── Hela Score ────────────────────────────────────────────────────────────
+    # ── Mula Score ────────────────────────────────────────────────────────────
     score_engine_version: int = 1
     score_min_data_days: int = 30
+
+    @model_validator(mode="after")
+    def validate_production_security(self) -> "Settings":
+        if self.app_env.lower() in {"production", "prod"}:
+            if self.secret_key == "change-me-to-a-random-64-char-secret":
+                raise ValueError("SECRET_KEY must be set to a unique value in production")
+            if self.debug:
+                raise ValueError("DEBUG must be false in production")
+        return self
 
 
 @lru_cache

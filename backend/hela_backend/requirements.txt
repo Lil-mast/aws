@@ -7,6 +7,7 @@ sqlalchemy==2.0.30
 alembic==1.13.1
 psycopg2-binary==2.9.9          # PostgreSQL driver (production)
 aiosqlite==0.20.0               # async SQLite driver (development)
+asyncpg==0.29.0                  # async PostgreSQL driver
 
 # ── Auth ───────────────────────────────────────────────────────────────────────
 python-jose[cryptography]==3.3.0

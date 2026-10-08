@@ -97,8 +97,8 @@ class BedrockResponse:
 
 # ── System prompt ─────────────────────────────────────────────────────────────
 
-_SYSTEM_PROMPT = """You are Hela, an intelligent AI financial coach built for East African users.
-You help with budgeting, financial planning, savings goals, and understanding Hela Scores.
+_SYSTEM_PROMPT = """You are Mula, an intelligent AI financial coach built for East African users.
+You help with budgeting, financial planning, savings goals, and understanding Mula Scores.
 
 Key rules:
 - Always be warm, practical, and encouraging.
@@ -121,7 +121,7 @@ _FALLBACK_RESPONSES: dict[str, str] = {
         "first step. Would you like to start there?"
     ),
     "score_coaching": (
-        "Your Hela Score reflects your payment consistency, savings behaviour, and spending "
+        "Your Mula Score reflects your payment consistency, savings behaviour, and spending "
         "discipline. Keep making consistent payments and hitting your savings targets to improve it."
     ),
     "spending_category": "miscellaneous",
@@ -130,11 +130,11 @@ _FALLBACK_RESPONSES: dict[str, str] = {
         "food and utilities — consider setting a budget cap to improve your score."
     ),
     "insight": (
-        "Tip: Paying bills a few days early can add 4–8 points to your Hela Score each time."
+        "Tip: Paying bills a few days early can add 4–8 points to your Mula Score each time."
     ),
     "chat": (
-        "Hello! I'm Hela, your AI financial coach. How can I help you today? "
-        "You can ask me about budgeting, savings, or your Hela Score."
+        "Hello! I'm Mula, your AI financial coach. How can I help you today? "
+        "You can ask me about budgeting, savings, or your Mula Score."
     ),
 }
 

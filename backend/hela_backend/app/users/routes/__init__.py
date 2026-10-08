@@ -162,7 +162,7 @@ async def refresh_token(body: RefreshRequest, db: AsyncSession = Depends(get_db)
 @router.post("/google", response_model=TokenResponse)
 async def google_auth(body: GoogleAuthRequest, db: AsyncSession = Depends(get_db)):
     """
-    Verify a Google ID token from the frontend and return Hela JWT tokens.
+    Verify a Google ID token from the frontend and return Mula JWT tokens.
     The client obtains the ID token via Google Sign-In (one-tap or redirect).
     """
     try:
