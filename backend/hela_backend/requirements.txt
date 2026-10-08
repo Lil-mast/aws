@@ -1,0 +1,42 @@
+# ── Web framework ──────────────────────────────────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+
+# ── Database ───────────────────────────────────────────────────────────────────
+sqlalchemy==2.0.30
+alembic==1.13.1
+psycopg2-binary==2.9.9          # PostgreSQL driver (production)
+aiosqlite==0.20.0               # async SQLite driver (development)
+
+# ── Auth ───────────────────────────────────────────────────────────────────────
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.9         # form data / OAuth flows
+
+# ── Google OAuth ───────────────────────────────────────────────────────────────
+google-auth==2.29.0
+google-auth-oauthlib==1.2.0
+httpx==0.27.0                   # async HTTP client for Google token exchange
+
+# ── AWS Bedrock (AI) ───────────────────────────────────────────────────────────
+boto3==1.34.90
+botocore==1.34.90
+
+# ── Config / Env ───────────────────────────────────────────────────────────────
+pydantic==2.7.1
+pydantic-settings==2.2.1
+python-dotenv==1.0.1
+
+# ── Utilities ──────────────────────────────────────────────────────────────────
+dj-database-url==2.1.0          # DATABASE_URL parsing helper
+
+# ── Dev / Test ─────────────────────────────────────────────────────────────────
+pytest==8.2.0
+pytest-asyncio==0.23.6
+httpx==0.27.0                   # also used in tests
+coverage==7.5.1
+
+# ── Code quality ───────────────────────────────────────────────────────────────
+black==24.4.2
+isort==5.13.2
+flake8==7.0.0
