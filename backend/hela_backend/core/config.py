@@ -72,6 +72,7 @@ class Settings(BaseSettings):
     )
     aws_access_key_id: str = ""
     aws_secret_access_key: str = ""
+    aws_bearer_token_bedrock: str = ""
 
     # ── Mula Score ────────────────────────────────────────────────────────────
     score_engine_version: int = 1

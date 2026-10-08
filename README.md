@@ -1,509 +1,218 @@
-# Mula: Intelligent Financial Clarity for All
+# Mula
 
-**Mula** is an AI-powered personal and business finance platform built for individuals, families, professionals, and enterprises, starting in Kenya and scaling globally. Mula provides actionable insights, intelligent budgeting, smart reminders, automated goal tracking, and a **Mula Score** that shows how everyday money decisions shape financial health.
+**Know where your money goes. Feel clearer about what to do next.**
 
----
+Mula is a Kenya-first personal finance platform that brings spending, budgets,
+savings goals, and practical coaching into one experience. It is designed to
+help people build steadier financial habits, one understandable decision at a
+time.
 
-## Run the App
+> Mula is an educational financial wellness product. It is not a credit bureau
+> score, lender, or substitute for professional financial advice.
 
-The application is under active development; run the backend locally using the steps below.
+## The product
 
----
+People often manage money across multiple accounts, bills, and informal
+commitments. Mula helps bring that picture together, make a realistic plan, and
+turn financial activity into useful next steps.
 
-## Table of Contents
-
-- [Quick Start](#quick-start)
-- [Core Features](#core-features)
-- [Mula Score](#mula-score)
-- [Smart Budget Agent](#smart-budget-agent)
-- [AI Assistant Architecture](#ai-assistant-architecture)
-- [Integrations](#integrations-in-progress)
-- [How It Works](#how-it-works)
-- [Project Structure](#project-structure)
-- [API Documentation](#api-documentation)
-- [Roadmap](#roadmap)
-- [Development](#development)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
-- [Support](#support)
-
-The full technology breakdown lives in [tech.md](./tech.md).
-
----
-
-## Quick Start
-
-### Prerequisites
-- Node.js 20+ and [pnpm](https://pnpm.io/)
-- Python 3.11+
-- PostgreSQL 13+ (optional, SQLite is used in development by default)
-- Redis 6+ (optional, for Celery)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd mula
-   ```
-
-2. **Frontend Setup**
-   ```bash
-   # Project root (React frontend)
-   pnpm install
-   pnpm dev
-   ```
-   Frontend runs on: http://localhost:5173
-
-3. **Backend Setup**
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
-   pip install -r hela_backend/requirements.txt
-   cp .env.example .env
-   # Edit backend/.env with local credentials as needed
-   uvicorn main:app --app-dir hela_backend --reload
-   ```
-   Backend API runs on: http://localhost:8000 (docs at `/docs`; health at `/health`)
-
-### Environment Variables
-Create `backend/.env` from `backend/.env.example`:
-```bash
-# Mula API
-APP_ENV=development
-SECRET_KEY=replace-with-a-random-secret
-DEBUG=True
-ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
-
-# Database (blank uses local SQLite; configure PostgreSQL for production)
-DATABASE_URL=
-
-# Google OAuth
-GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-
-# AWS Bedrock (for AI features)
-AI_PROVIDER=local
-BEDROCK_REGION=us-east-1
-BEDROCK_NOVA_LITE_MODEL_ID=arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0
-BEDROCK_NOVA_MICRO_MODEL_ID=arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0
-AWS_ACCESS_KEY_ID=your-aws-access-key
-AWS_SECRET_ACCESS_KEY=your-aws-secret-key
-
-# Redis / Celery
-REDIS_URL=redis://localhost:6379/1
-
-# Paystack
-PAYSTACK_SECRET_KEY=your-paystack-secret-key
-
-# Mula Score
-SCORE_ENGINE_VERSION=1
+```mermaid
+flowchart LR
+    A[Create a profile] --> B[Record income and spending]
+    B --> C[Build a budget and savings goals]
+    C --> D[Review progress]
+    D --> E[Get practical coaching]
+    E --> F[Choose a next step]
+    F --> B
+    D -. in development .-> G[Mula Score and decision history]
 ```
 
----
+## Features
 
-## Core Features
+| Capability | What it does | Status |
+|---|---|---|
+| Personal finance records | Store transactions, income, expenses, budgets, and savings plans | Backend APIs and data models are in place |
+| Budget planning | Organize money around needs, wants, and savings | Budget APIs are in place; guided product experience is evolving |
+| AI money coach | Chat about budgeting and financial questions, with saved conversation history | Chat API is in place; AWS model use is optional |
+| Mula Score | Explain how habits such as bill payments and savings relate to financial health | In development; not a credit bureau score |
+| M-Pesa and financial connections | Reduce manual entry by connecting financial activity | Planned integration |
+| Business finance tools | Support cash-flow planning and business insights | Future product phase |
 
-### Mula for Personal Use
-- **Dashboard**: Overview of finances, goals, savings, score, and tips
-- **Transactions**: Sync with M-Pesa to view and label expenses
-- **Budget**: Smart budget builder with the 50/30/20 rule, income and expense tracking
-- **AI Coach**: Interactive chat with Mula's Smart Budget Agent for personalized financial guidance
-- **Goals**: Track financial goals like an emergency fund, school fees, and more
-- **Mula Score**: A living financial health score with a clear explanation of every change
-- **Chat History**: Persistent conversation history, browse, load, and delete past chats
-- **Reminders**: Get alerts for bills, savings, and tasks
-- **Savings**: Link M-Shwari, KCB M-Pesa, and Ziidi for live savings updates
-- **Learn Page**: Financial literacy with an interactive AI tutor
-- **Settings**: Profile, preferences, plan, and subscription management
+The current backend provides account, transaction, financial-planning, and
+assistant foundations. Some experiences and integrations remain under active
+development.
 
-### Mula for Business (Coming Soon)
-- Cash flow dashboards
-- Expense categorization and insights
-- AI-powered financial forecasting
-- Custom analytics based on business type
-- Business credit readiness score
-- Team collaboration and reports
+## First-time onboarding and sign-in
 
----
+The current onboarding is intentionally short. A new user chooses **Create
+account**, enters their name, email, and password, and is signed in after the
+account is created. Returning users sign in with email and password. The API
+hashes passwords, creates a default profile, and issues access and refresh
+tokens.
 
-## Mula Score
-
-Most people only learn about their credit standing when a loan is declined. Mula flips that. The **Mula Score** is a behavior-based financial health score that updates as you make decisions, so you can see the effect of a good choice the moment you make it.
-
-> **Important:** The Mula Score is an educational, behavior-based score. It is **not** a credit bureau score (such as TransUnion, Metropol, or Creditinfo in Kenya) and does not replace one. Future phases may add bureau data and lender-facing reports with explicit user consent.
-
-### The Idea
-
-1. You make a money decision (pay a bill early, hit a savings target, stay within budget).
-2. Mula detects it from your transactions, budget, and goals.
-3. Your score moves, and Mula shows exactly why: *"+6 points: You paid your KPLC bill 3 days before the due date."*
-4. The AI Coach explains what to do next to keep improving.
-
-### Score Range and Tiers
-
-The score runs from **300 to 850**, split into tiers:
-
-| Tier | Range | Meaning |
-|------|-------|---------|
-| Building | 300 – 499 | Early stage. Small, consistent habits make the biggest difference. |
-| Fair | 500 – 579 | Some good habits, with clear room to grow. |
-| Good | 580 – 669 | Steady habits and manageable debt. |
-| Strong | 670 – 739 | Reliable repayment and healthy savings. |
-| Excellent | 740 – 850 | Highly disciplined, lender-ready behavior. |
-
-New users start with a baseline score once they have at least **30 days** of synced data. Until then, Mula shows a "Score warming up" progress state instead of a number.
-
-### Score Factors
-
-| Factor | Weight | What Mula Looks At |
-|--------|--------|--------------------|
-| **Payment Consistency** | 30% | On-time bills, loan repayments, and subscription payments |
-| **Savings Behavior** | 25% | Regular contributions, emergency fund progress, goal completion |
-| **Spending Discipline** | 20% | Budget adherence, wants vs needs ratio, impulse spending patterns |
-| **Debt Management** | 15% | Debt-to-income ratio, repayment pace, reliance on mobile loans such as Fuliza |
-| **Financial Stability** | 10% | Income regularity, account activity, balance buffer |
-
-Weights are versioned (`SCORE_ENGINE_VERSION`) so changes are transparent and past scores can be explained.
-
-### Decision Impact Feed
-
-Every score change is recorded as a **score event**. Examples:
-
-| Decision | Example Impact |
-|----------|----------------|
-| Paid a bill before its due date | +4 to +8 |
-| Hit a monthly savings target | +10 |
-| Stayed within budget for a full month | +12 |
-| Cleared a loan earlier than scheduled | +15 |
-| Used Fuliza repeatedly in one month | -6 |
-| Missed a bill or loan due date | -10 to -20 |
-| Overspent a category beyond the budget | -4 |
-
-Impact values are illustrative and are tuned through the scoring engine configuration.
-
-### What-If Simulator
-
-Before acting, users can ask: *"What happens to my score if I clear my Fuliza balance this week?"* The simulator runs the same scoring engine on a hypothetical change and returns the projected impact, so people can compare decisions before committing.
-
-### AI Coach Integration
-
-The score engine is **deterministic**: calculations happen in the backend using transparent rules. The AI (Nova Lite) only **narrates and coaches** around the numbers. It never invents or changes a score.
-
-Example coaching:
-- *"Your score rose 18 points this month, mostly from consistent savings. Your biggest opportunity now is reducing Fuliza use."*
-- *"Clearing your M-Shwari loan 2 weeks early could add roughly 10 to 15 points."*
-
-### Privacy, Consent, and Compliance
-
-- Score data is used only with the user's explicit consent
-- Users can view, export, or delete their score history at any time
-- No score data is shared with third parties or lenders without opt-in consent
-- Designed with Kenya's **Data Protection Act, 2019** in mind, with data minimization and purpose limitation
-- Any move toward lender-facing credit products should be reviewed against **CBK digital credit** regulations and CRB requirements before launch
-
-### Planned Score Phases
-
-| Phase | Focus |
-|-------|-------|
-| **Phase 1** | Rule-based score from M-Pesa transactions, budgets, goals, and reminders. History chart and decision feed. |
-| **Phase 2** | What-if simulator, score-linked goals and challenges, AI Coach explanations. |
-| **Phase 3** | Opt-in sharing of a verified score report, partner lender pilots, bureau data enrichment. |
-| **Phase 4** | Business credit readiness score, regional expansion beyond Kenya. |
-
----
-
-## Smart Budget Agent
-
-Mula includes an intelligent **Smart Budget Agent** that builds a complete personal budget plan interactively.
-
-### How It Works
-
-The agent follows a structured 5-step process, showing calculations after every answer:
-
-| Step | What Happens |
-|------|-------------|
-| 1. **Income** | You tell the agent your monthly take-home income. It calculates 50/30/20 targets live. |
-| 2. **Fixed Expenses** | You share rent, utilities, transport, loans. The agent tracks running totals against your needs budget. |
-| 3. **Variable Expenses** | You discuss food, entertainment, shopping. The agent shows the remaining wants budget. |
-| 4. **Savings & Goals** | The agent helps allocate savings toward an emergency fund, goals, or debt repayment. |
-| 5. **Budget Plan** | A beautifully formatted complete budget plan is presented with category breakdown, totals, and surplus. |
-
-### Key Behaviors
-- Shows running math after each input: ✅ recorded + remaining budget
-- Adapts to your currency (KES, NGN, USD, etc.)
-- Detects debt and prioritizes repayment
-- Recommends emergency fund building
-- Handles overspending by suggesting cuts to wants, not needs
-- Asks one question at a time for a natural conversation flow
-- Shows how budget decisions affect your Mula Score
-
-### Visual Progress Tracker
-When chatting with the agent, a 5-stage progress bar shows your current position:
+```mermaid
+flowchart TD
+    A[Mula landing page] --> B{New or returning?}
+    B -->|New| C[Enter name, email, password]
+    C --> D[Create account and default profile]
+    D --> E[Sign in and receive session tokens]
+    B -->|Returning| F[Enter email and password]
+    F --> E
+    E --> G[Load profile, transactions, summary, budgets]
+    G --> H[Open the dashboard]
+    H --> I[Add transactions or create a budget]
+    H --> J[Ask the Mula assistant]
 ```
-💰 Income → 📊 Fixed Expenses → 🛒 Variable Expenses → 🎯 Savings → 📋 Budget Plan
+
+New users go straight to the dashboard; the current app does not require a
+lengthy questionnaire or a bank connection before they can begin. Currency
+defaults to KES, and users can start by entering transactions and setting up a
+budget. The score-consent field defaults to off. Google sign-in is supported by
+an API endpoint, but it is not yet connected to the current sign-in screen.
+
+## Mula Score: a different kind of algorithm
+
+Mula Score is designed to answer a different question from a conventional
+credit score. Instead of estimating whether someone should receive credit, it
+aims to show how their everyday financial habits are developing and what they
+could improve next. It is a personal financial-health measure, not a lender
+rating or a credit bureau score.
+
+The planned algorithm is **behavior-based, deterministic, and explainable**:
+
+1. With the user's consent and at least 30 days of financial history, Mula
+   looks for meaningful events such as paying a bill on time, meeting a savings
+   goal, or overspending a budget.
+2. Each event contributes to one or more financial-health factors.
+3. A versioned rules engine combines the factor results into a score and saves
+   a snapshot.
+4. Mula shows the factors and events behind the result, so a user can see what
+   helped, what hurt, and what action to consider next.
+
+```mermaid
+flowchart LR
+    A[User-approved money activity] --> B[Detect meaningful events]
+    B --> C[Apply versioned rules]
+    C --> D[Combine weighted factors]
+    D --> E[Save score and factor snapshot]
+    E --> F[Show score movement and reasons]
+    F --> G[Suggest a next step]
 ```
-Completed stages light up green as you progress.
 
----
+The design groups behavior into five factors:
 
-## AI Assistant Architecture
+| Factor | Planned weight | Examples of what it considers |
+|---|---:|---|
+| Payment consistency | 30% | On-time bills and repayments |
+| Savings behavior | 25% | Regular saving and progress toward goals |
+| Spending discipline | 20% | Budget adherence and spending patterns |
+| Debt management | 15% | Repayment progress and reliance on short-term borrowing |
+| Financial stability | 10% | Income regularity and maintaining a balance buffer |
 
-### Provider System
-Mula supports pluggable AI providers. The provider is selected via the `AI_PROVIDER` env var:
+This makes Mula Score a **financial-habit algorithm**, not a renamed credit
+score: savings and budgeting behavior count alongside debt and payments, and
+the intended output is personal guidance rather than a lending decision. The
+weights and 300–850 display range are the current design; they may change as
+the rules are developed and reviewed. Exact event point values and the final
+conversion from factor results to the displayed range are not finalized.
 
-| Provider | `AI_PROVIDER` value | Description |
-|----------|-------------------|-------------|
-| **AWS Bedrock Nova** | `bedrock` | Primary provider: Nova Lite (reasoning) + Nova Micro (speed) with strict rate limiting |
-| **Local Fallback** | anything else | Keyword-based responses for testing and offline use |
+The number is intended to come from backend rules, never from an AI model. AI
+may explain a recorded score change in plain language, but it must not invent
+or change the score. The score engine, score API, and simulator are still in
+development; the current code has data models for snapshots, factors, and
+events, but does not yet calculate a live Mula Score.
 
-### Bedrock Nova Routing
-Tasks are automatically routed to the optimal model:
+## How the AI coach works
 
-| Model | Used For | RPM Limit | Cost (per 1K tokens) |
-|-------|----------|-----------|---------------------|
-| **Nova Lite** | Financial advice, budget planning, chat, transaction analysis, score coaching | 50 | Input: $0.000060, Output: $0.000240 |
-| **Nova Micro** | Spending categorization, quick lookups | 50 | Input: $0.000035, Output: $0.000140 |
+Mula keeps the AI in a supporting role: it can explain and coach, while
+financial calculations and product rules belong in the application.
 
-### Rate Limiting
-- Per-model token bucket rate limiters (50 RPM each)
-- Exponential backoff with jitter on throttling (max 5 retries)
-- Request timeout: 30 seconds
+```mermaid
+sequenceDiagram
+    actor Person
+    participant App as Mula app
+    participant API as FastAPI backend
+    participant Store as PostgreSQL / SQLite
+    participant AI as Amazon Bedrock or local fallback
 
-### Planned Tasks
-The assistant recognizes the following task types:
-- `chat`: General Q&A
-- `budget_planning`: Interactive budget building (Smart Budget Agent)
-- `financial_advice`: Personalized coaching and recommendations
-- `transaction_analysis`: Spending pattern analysis
-- `mpesa_assistance`: M-Pesa transaction guidance
-- `payment_recommendations`: Secure payment advice
-- `spending_category`: Transaction categorization
-- `insight`: Quick personalized financial insight
-- `score_coaching`: Explains score changes and suggests next steps (narration only, never calculates)
+    Person->>App: Ask a money question
+    App->>API: Send authenticated chat request
+    API->>Store: Load and save conversation
+    API->>AI: Request a response when AI is enabled
+    AI-->>API: Return coaching response
+    API-->>App: Return response and conversation ID
+    App-->>Person: Show the next-step guidance
+```
 
----
+## AWS services
 
-## Integrations (In Progress)
-- **M-Pesa**: Transaction syncing
-- **AWS Bedrock**: AI chat via Amazon Nova (Lite + Micro) with strict rate limiting and cost controls
-- **Paystack**: Payment processing
-- **Google OAuth**: Social login
-- **Ziidi / KCB M-Pesa / M-Shwari**: Savings and investments
-- **Credit Reference Bureaus** (planned): Optional, consent-based data enrichment for the Mula Score
+| AWS service | How Mula uses it | Why |
+|---|---|---|
+| **Amazon Bedrock Runtime** | Optional AI inference through the Converse API, using Amazon Nova Lite and Nova Micro | Nova Lite handles chat and reasoning-oriented requests; Nova Micro handles quick categorization requests |
 
----
+Bedrock is enabled with `AI_PROVIDER=bedrock`. The backend includes rate
+limiting, retries for temporary service errors, and a local fallback when
+Bedrock is disabled or unavailable. AWS access is provided through Boto3 and
+the configured AWS credentials or runtime role.
 
-## How It Works
+For local development, store AWS credentials in `backend/.env`. Use
+`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` for an IAM key pair, or
+`AWS_BEARER_TOKEN_BEDROCK` for a Bedrock bearer API key. The bearer token setting
+is optional; use a runtime role or short-lived credentials in deployed services.
 
-1. **User signs up** (email or Google)
-2. **Profile setup** to customize the experience
-3. **Data sync**: Transactions pulled, labeled, categorized
-4. **User selects or builds a budget plan** using the Smart Budget Agent
-5. **Mula AI assistant** gives tips, reminders, and updates via conversation
-6. **Mula Score** is calculated from behavior and updates after meaningful decisions
-7. **User tracks savings goals**, receives reports and feedback
-8. **Chat history** is saved so any past conversation can be revisited
+**Amazon Bedrock Runtime is the only AWS service currently integrated in this
+repository.** The application uses Neon for hosted PostgreSQL and SQLite for
+local development. AWS hosting, storage, queues, and authentication services
+are not currently configured.
 
----
+## Technology
 
-## Project Structure
+- **Frontend:** React, TypeScript, Vite
+- **API:** Python, FastAPI, SQLAlchemy
+- **Database:** PostgreSQL on Neon; SQLite for local development
+- **Database schema:** SQLAlchemy models; local development creates tables on startup
+- **AI:** Amazon Bedrock Nova, with a local fallback
+
+## Run locally
+
+Requirements: Node.js and pnpm for the frontend, plus Python 3.12 for the backend.
 
 ```bash
-/
-├── src/                    # React frontend
-│   ├── components/         # UI components
-│   │   ├── DashboardLayout.tsx
-│   │   ├── CollapsibleSidebar.tsx
-│   │   └── score/          # ScoreGauge, FactorBreakdown, DecisionFeed
-│   ├── pages/              # Page components
-│   │   ├── BudgetPage.tsx  # Budget tab + AI Coach with Smart Budget Agent
-│   │   ├── ChatPage.tsx    # Full AI Coach with conversation history sidebar
-│   │   ├── ScorePage.tsx   # Mula Score: gauge, history, factors, simulator
-│   │   └── ...
-│   ├── lib/
-│   │   └── api.ts          # API client with auth headers
-│   └── contexts/
-│       └── AuthContext.tsx # Authentication state
-│
-├── public/                 # Static assets (favicon)
-│
-├── backend/
-│   └── hela_backend/
-│       ├── door/
-│       │   ├── settings.py       # Legacy monolithic settings
-│       │   └── settings/         # Settings package (base, development, production, testing)
-│       │       ├── base.py
-│       │       └── development.py
-│       ├── users/                # User management + auth views
-│       ├── ai_assistant/         # AI assistant app
-│       │   ├── models.py         # Conversation, Message, AIInsight, FinancialGoal
-│       │   ├── views.py          # Chat, analysis, conversation CRUD endpoints
-│       │   ├── serializers.py
-│       │   ├── urls.py
-│       │   └── services/
-│       │       ├── bedrock_client.py        # Bedrock Nova integration + rate limiting
-│       │       └── conversation_manager.py  # Conversation orchestration + fallback
-│       ├── credit_score/         # Mula Score app
-│       │   ├── models.py         # ScoreSnapshot, ScoreEvent, ScoreFactor
-│       │   ├── views.py          # Score, history, factors, events, simulate endpoints
-│       │   ├── tasks.py          # Celery: scheduled and event-triggered recalculation
-│       │   └── services/
-│       │       ├── scoring_engine.py   # Deterministic, versioned scoring rules
-│       │       ├── event_detector.py   # Turns transactions and budgets into score events
-│       │       └── simulator.py        # What-if projections
-│       ├── transactions/         # Transaction management
-│       ├── financial_planning/   # Budget, SavingsPlan, Expense, Income models
-│       ├── payments/             # Paystack integration
-│       └── .env.example
-│
-├── .env.example             # Frontend env template
-├── .gitignore
-├── tech.md
-└── README.md
+# Frontend
+cd frontend
+cp .env.example .env.local
+pnpm install
+pnpm dev
 ```
 
----
+In a second terminal:
 
-## API Documentation
-
-### Authentication Endpoints
-- `POST /api/v1/auth/register`: User registration
-- `POST /api/v1/auth/login`: User login (returns JWT tokens)
-- `POST /api/v1/auth/google`: Google OAuth sign-in
-- `POST /api/v1/auth/logout`: Invalidate refresh token
-- `POST /api/v1/auth/token/refresh`: Refresh JWT access token
-- `GET /api/v1/auth/profile`: Get user profile
-- `PUT /api/v1/auth/profile/update`: Update profile
-
-### AI Assistant Endpoints
-- `POST /api/v1/assistant/chat`: Chat with Mula AI (supports `budget_planning`, `financial_advice`, `score_coaching`, and `chat`)
-- The chat endpoint accepts `{ "message": "...", "conversation_id": null, "task_type": "chat" }` and requires a bearer access token.
-- Other assistant endpoints are planned.
-
-### Mula Score Endpoints (Planned)
-- `GET /api/v1/score/`: Current score, tier, and change since last period
-- `GET /api/v1/score/history/`: Score snapshots over time for charting
-- `GET /api/v1/score/factors/`: Breakdown by factor with per-factor status
-- `GET /api/v1/score/events/`: Decision impact feed (what moved the score and why)
-- `POST /api/v1/score/simulate/`: What-if projection for a hypothetical decision
-- `GET /api/v1/score/report/`: Exportable score report (opt-in sharing in later phases)
-- `DELETE /api/v1/score/data/`: Delete score history (user data control)
-
-### Budget & Financial Planning Endpoints
-- `GET /api/v1/financial/budgets`: List budgets
-- `POST /api/v1/financial/budgets/create`: Create a budget
-- `GET /api/v1/financial/budgets/{id}`: Budget details with categories
-
-The interactive API reference is available at `/docs`; the liveness endpoint is `GET /health`.
-- `GET /api/v1/financial/savings/`: List savings plans
-- `POST /api/v1/financial/savings/create/`: Create savings plan
-- `GET /api/v1/financial/expenses/`: List expenses
-- `POST /api/v1/financial/expenses/create/`: Record an expense
-- `GET /api/v1/financial/incomes/`: List income entries
-- `POST /api/v1/financial/incomes/create/`: Record income
-
-### Transaction Endpoints
-- `GET /api/v1/transactions/`: Get user transactions
-- `POST /api/v1/transactions/`: Create new transaction
-- `GET /api/v1/transactions/summary/`: Get transaction summary
-
----
-
-## Roadmap
-
-- [x] Smart Budget Agent with 5-step flow
-- [x] Persistent AI chat history
-- [x] Bedrock Nova routing with rate limiting
-- [ ] M-Pesa live transaction sync
-- [ ] **Mula Score Phase 1**: rule-based score, history, decision feed
-- [ ] **Mula Score Phase 2**: what-if simulator and score-linked challenges
-- [ ] Mula for Business
-- [ ] **Mula Score Phase 3**: opt-in verified reports and lender pilots
-- [ ] Regional expansion beyond Kenya
-
----
-
-## Development
-
-### Running Tests
 ```bash
-# Backend tests (from backend/hela_backend)
+# Backend
 cd backend
-pytest
+python3.12 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python -m pip install -r hela_backend/requirements.txt
+test -f .env || cp .env.example .env
+./run-local.sh
 ```
 
-### Code Quality
-```bash
-# Frontend linting
-pnpm lint
+The public Mula introduction runs at `http://localhost:5173`; choose **Get
+started** or visit `/app` to sign in and use the finance app. The API runs at
+`http://localhost:8000`; API documentation is at `/docs`. For Neon configuration,
+see [Database and Neon setup](./docs/database-and-neon.md).
 
-# Backend formatting
-cd backend
-black .
-isort .
-flake8
-```
+For backend-only setup, database behavior, health checks, and troubleshooting,
+see the [FastAPI backend guide](./backend/README.md).
 
-### Database Management
-Production Alembic migration setup is pending. Development automatically creates tables in SQLite.
+## Product direction
 
----
+Mula is being built around three principles:
 
-## Deployment
+1. **Clarity:** make money activity and trade-offs easier to understand.
+2. **Practicality:** turn insight into small, achievable next steps.
+3. **Trust:** explain how guidance is produced and keep sensitive financial
+   features consent-based.
 
-### Docker Deployment
-```bash
-docker-compose up -d
-docker-compose logs -f
-docker-compose down
-```
-
-### Production Setup
-1. **Environment Configuration**
-   - Set `DEBUG=False`
-   - Configure production database (Neon PostgreSQL recommended)
-   - Set up Redis for caching
-   - Configure AWS Bedrock credentials for AI features
-
-2. **Static Files**
-   ```bash
-   # Serve FastAPI with an ASGI server such as Uvicorn.
-   ```
-
-3. **Database**
-   ```bash
-   # Production database migration setup is pending.
-   ```
-
-4. **Start Services**
-   ```bash
-   uvicorn main:app --app-dir backend/hela_backend --host 0.0.0.0 --port 8000
-   ```
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## Support
-
-For support and questions:
-Contact details will be published when Mula launches.
-
----
-
-**Built with ❤️ for Kenya and the world**
+Read the [user story](./docs/user-story.md) for the intended customer journey,
+or [tech.md](./tech.md) for the broader architecture.

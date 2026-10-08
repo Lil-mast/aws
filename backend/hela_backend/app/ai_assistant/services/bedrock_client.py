@@ -12,6 +12,7 @@ AWS Bedrock Nova integration with:
 import json
 import logging
 import random
+import os
 import time
 import threading
 from dataclasses import dataclass, field
@@ -159,13 +160,18 @@ class BedrockClient:
     def __init__(self) -> None:
         self._enabled = settings.ai_provider.lower() == "bedrock"
         if self._enabled:
-            self._client = boto3.client(
-                "bedrock-runtime",
-                region_name=settings.bedrock_region,
-                aws_access_key_id=settings.aws_access_key_id or None,
-                aws_secret_access_key=settings.aws_secret_access_key or None,
-                config=Config(read_timeout=30, connect_timeout=10),
-            )
+            client_options = {
+                "region_name": settings.bedrock_region,
+                "config": Config(read_timeout=30, connect_timeout=10),
+            }
+            if settings.aws_bearer_token_bedrock:
+                # Boto3 reads Bedrock bearer credentials from this environment
+                # variable; Settings also loads it from backend/.env.
+                os.environ["AWS_BEARER_TOKEN_BEDROCK"] = settings.aws_bearer_token_bedrock
+            else:
+                client_options["aws_access_key_id"] = settings.aws_access_key_id or None
+                client_options["aws_secret_access_key"] = settings.aws_secret_access_key or None
+            self._client = boto3.client("bedrock-runtime", **client_options)
 
     def _model_id(self, task_type: str) -> str:
         if task_type in _NOVA_MICRO_TASKS:

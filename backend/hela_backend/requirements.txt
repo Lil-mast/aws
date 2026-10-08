@@ -4,7 +4,6 @@ uvicorn[standard]==0.29.0
 
 # ── Database ───────────────────────────────────────────────────────────────────
 sqlalchemy==2.0.30
-alembic==1.13.1
 psycopg2-binary==2.9.9          # PostgreSQL driver (production)
 aiosqlite==0.20.0               # async SQLite driver (development)
 asyncpg==0.29.0                  # async PostgreSQL driver
@@ -12,6 +11,7 @@ asyncpg==0.29.0                  # async PostgreSQL driver
 # ── Auth ───────────────────────────────────────────────────────────────────────
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+bcrypt==4.0.1                   # Compatible with Passlib 1.7.4 password hashing
 python-multipart==0.0.9         # form data / OAuth flows
 
 # ── Google OAuth ───────────────────────────────────────────────────────────────
@@ -20,8 +20,8 @@ google-auth-oauthlib==1.2.0
 httpx==0.27.0                   # async HTTP client for Google token exchange
 
 # ── AWS Bedrock (AI) ───────────────────────────────────────────────────────────
-boto3==1.34.90
-botocore==1.34.90
+boto3==1.43.108
+botocore==1.43.108
 
 # ── Config / Env ───────────────────────────────────────────────────────────────
 pydantic==2.7.1

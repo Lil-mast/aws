@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Mr T",
+      "trigger": "PostFileSave",
+      "action": {
+        "type": "agent",
+        "prompt": "Review the changes associated with the saved file.\n\nDetermine whether the change affects project behavior,\narchitecture, APIs, database structure, configuration,\nor other information that should be documented.\n\nIf the change is meaningful, update the appropriate\nproject documentation.\n\nDo not modify application source code.\n\nDo not document trivial formatting or whitespace changes.\n\nDo not invent functionality that is not present in the\nactual project changes."
+      },
+      "description": "Whenever meaningful project code changes, automatically ask Kiro to document what changed.",
+      "enabled": true
+    }
+  ]
+}

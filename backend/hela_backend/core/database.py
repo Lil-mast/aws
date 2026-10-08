@@ -60,7 +60,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def create_tables() -> None:
-    """Create all tables — called once at startup (dev only; use Alembic in prod)."""
+    """Create tables at development startup."""
     async with engine.begin() as conn:
         from app.users import models as _  # noqa: F401 — ensure all models imported
         from app.transactions import models as _  # noqa: F401

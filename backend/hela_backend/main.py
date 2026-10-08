@@ -16,8 +16,8 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # Local development stays zero-config. Production schema changes belong in
-    # Alembic migrations, never automatic create_all calls.
+    # Local development stays zero-config. Production schema changes should be
+    # applied explicitly before deploying the API.
     if settings.app_env.lower() == "development":
         from core.database import create_tables
 
